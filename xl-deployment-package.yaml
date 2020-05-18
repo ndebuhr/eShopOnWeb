@@ -1,0 +1,37 @@
+---
+apiVersion: xl-deploy/v1
+kind: Applications
+spec:
+- directory: Applications
+  children:
+  - name: eShopOnWeb
+    type: udm.Application
+    lastVersion: !format 1.0.%BUILD_NUMBER%
+    children:
+    - name: !format 1.0.%BUILD_NUMBER%
+      type: udm.DeploymentPackage
+      deployables:
+      - name: eshop-service
+        type: k8s.ServiceSpec
+        serviceName: static-site
+        serviceType: ClusterIP
+        selectors:
+          application: eshop
+        ports:
+        - name: http
+          type: k8s.ServicePortSpec
+          portName: http
+          port: "80"
+      - name: eshop-deployment
+        type: k8s.DeploymentSpec
+        containers:
+        - name: eshop
+          type: k8s.ContainerSpec
+          containerName: caddy
+          image: !format "%DEPLOYMENTREGISTRY%/eshop-on-web:1.0.%BUILD_NUMBER%"
+        podCreateDeleteRetryCount: "20"
+        labels:
+          application: eshop
+        restartPolicy: Always
+        deploymentName: eshop
+        replicasCount: "1"
