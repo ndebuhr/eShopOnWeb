@@ -6,9 +6,8 @@ node {
    }
    stage('Build') {
       withEnv(["DOCKER_HOST=${DOCKERHOST}"]) {
-        dir("src/Web") {
-          sh "docker build --no-cache -t ${BUILDREGISTRY}/eshop-on-web:1.0.$BUILD_NUMBER ."
-        }
+        sh "docker build --no-cache -f src/Web/Dockerfile -t ${BUILDREGISTRY}/eshop-on-web:1.0.$BUILD_NUMBER ."
+        sh 'docker build --no-cache -f scanner/Dockerfile -t sonar-scanner:latest .'
       }
    }
    stage('Scan Artifacts') {
